@@ -1,0 +1,139 @@
+name: Builds - Windows (development)
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  unityVersion: "2021.3.21f1"
+  unityVersionHash: "1b156197d683"
+
+jobs:
+  windowsBuilder:
+    name: Windows Build (using commit ${{ github.event.head_commit }})
+    runs-on: windows-2019
+    timeout-minutes: 90
+
+    steps:
+      ###########################
+      #         Checkout        #
+      ###########################
+      - name: "[Pre-install] Pull project"
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      ###########################
+      #          Cache          #
+      ###########################
+      - name: "[Pre-install] Restore 'library' cache"
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: YARG-Library-Windows-Development
+          restore-keys: |
+            YARG-Library-Windows-
+
+      ###########################
+      #     Install Blender     #
+      ###########################
+
+
+      - name: "[Pre-install] Get Blender (3.4.1) from cache"
+        id: blender
+        uses: actions/cache@v3
+        with: 
+          path: ${{ runner.temp }}/BlenderInstall
+          key: windows-blender-3.4.1
+          restore-keys: windows-blender-
+
+      - if: ${{ steps.blender.outputs.cache-hit != 'true' }}
+        name: "[Pre-install] Download Blender (3.4.1)"
+        continue-on-error: true
+        run: mkdir ${{ runner.temp }}\BlenderInstall && curl -L -o "${{ runner.temp }}\BlenderInstall\blender.msi" https://download.blender.org/release/Blender3.5/blender-3.5.1-windows-x64.msi
+
+      - name: "[Pre-install] Install Blender (3.4.1)"
+        run: >
+          $BLENDERMSI = "${{ runner.temp }}\BlenderInstall\blender.msi";
+          $BLENDERARGS = "/I $BLENDERMSI ALLUSERS=1 /qn /norestart";
+          Start-Process "msiexec.exe" -ArgumentList $BLENDERARGS -wait -nonewwindow
+
+      ###########################
+      #    Install Libraries    #
+      ###########################
+      - name: "[Pre-install] Install Libraries"
+        run: pip3 install requests && python3 InstallLibraries/install.py
+        
+      ###########################
+      #    Restore  Packages    #
+      ###########################
+
+      - name: "[Pre-install] Install dotnet 7.x"
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: "[Pre-install] Restoring NuGet Packages"
+        run: dotnet tool install --global NuGetForUnity.Cli && nugetforunity restore
+
+      ###########################
+      #      Install Unity      #
+      ###########################
+
+      - name: "[Pre-install] Get Unity Editor + Windows IL2CPP builder (${{ env.unityVersion }}) pre-installed from cache"
+        id: unity-install
+        uses: actions/cache@v3.2.2
+        with: 
+          path: ${{ runner.temp }}/Unity
+          key: windows-unity-${{ env.unityVersion }}
+
+      - if: ${{ steps.unity-install.outputs.cache-hit != 'true' }}
+        name: "[Pre-install] Download Unity Editor + Windows IL2CPP builder"
+        continue-on-error: true
+        run: >
+          mkdir ${{ runner.temp }}\UnityInstall;
+          curl -L -o "${{ runner.temp }}\UnityInstall\UnitySetup64-${{ env.unityVersion }}.exe" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/Windows64EditorInstaller/UnitySetup64-${{ env.unityVersion }}.exe;
+          curl -L -o "${{ runner.temp }}\UnityInstall\UnitySetup-Windows-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.exe" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/TargetSupportInstaller/UnitySetup-Windows-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.exe;
+
+      - if: ${{ steps.unity-install.outputs.cache-hit != 'true' }}
+        name: "[Pre-install] Install Unity"
+        run: >
+          $UNITY_INSTALLARGUMENTS = "/S /D=${{ runner.temp }}\\Unity";
+          Start-Process "${{ runner.temp }}\UnityInstall\UnitySetup64-${{ env.unityVersion }}.exe" -ArgumentList $UNITY_INSTALLARGUMENTS -wait -nonewwindow;
+          Start-Process "${{ runner.temp }}\UnityInstall\UnitySetup-Windows-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.exe" -ArgumentList $UNITY_INSTALLARGUMENTS -wait -nonewwindow;
+          Remove-Item -Recurse -Force -Path ${{ runner.temp }}\UnityInstall\*;
+        # C:\Windows\system32\reg.exe export "HKLM\SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\Windows\v10.0" c:/regkeys/winsdk.reg /y
+
+      ###########################
+      #          Build          #
+      ###########################
+      - name: "[Build] Run Builder"
+        run: >
+          ${{ runner.temp }}/Unity/Editor/Unity.exe -quit -batchmode -nographics -projectPath ${{ github.workspace }} -buildTarget StandaloneWindows64 -buildWindows64Player ${{ github.workspace }}/build/YARG.exe -username ${{ secrets.UNITY_EMAIL }} -password ${{ secrets.UNITY_PASSWORD }} -serial ${{ secrets.WINDOWS_UNITY_SERIAL }} -logfile | Out-Host;
+          Write-Output "$('Finished build, exit code ')$($LastExitCode)$('"')";
+          Remove-Item -Recurse -Force -Path ${{ github.workspace }}\build\YARG_BurstDebugInformation_DoNotShip\*;
+
+      ###########################
+      #         Upload          #
+      ###########################
+      - name: "[Post-build] Upload to artifacts"
+        uses: actions/upload-artifact@v3
+        with:
+          name: Finished build
+          path: build
+
+      - name: "[Post-build] Upload to releases on ${{ vars.DEVBUILD_REPOSITORY }}"
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          files: build/*
+          fail_on_unmatched_files: true
+          name: ${{ github.event.head_commit }}
+          repository: ${{ vars.DEVBUILD_REPOSITORY }}
+          token : ${{ secrets.DEVBUILD_TOKEN }}
