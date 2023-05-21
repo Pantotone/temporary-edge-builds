@@ -1,9 +1,6 @@
 name: Builds - Windows (development)
 
 on:
-  push:
-    branches:
-      - dev
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +13,7 @@ env:
 
 jobs:
   windowsBuilder:
-    name: Windows Build (using commit ${{ github.event.head_commit }})
+    name: Windows Build
     runs-on: windows-2019
     timeout-minutes: 90
 
@@ -27,7 +24,12 @@ jobs:
       - name: "[Pre-install] Pull project"
         uses: actions/checkout@v3
         with:
+          repository: YARC-Official/YARG
+          ref: dev
           lfs: true
+
+      - name: "[Pre-install] Save commit sha into env"
+        run: echo "commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $GITHUB_ENV
 
       ###########################
       #          Cache          #
@@ -86,7 +88,7 @@ jobs:
       #      Install Unity      #
       ###########################
 
-      - name: "[Pre-install] Get Unity Editor + Windows IL2CPP builder (${{ env.unityVersion }}) pre-installed from cache"
+      - name: "[Install] Get Unity Editor + Windows IL2CPP builder (${{ env.unityVersion }}) pre-installed from cache"
         id: unity-install
         uses: actions/cache@v3.2.2
         with: 
@@ -94,7 +96,7 @@ jobs:
           key: windows-unity-${{ env.unityVersion }}
 
       - if: ${{ steps.unity-install.outputs.cache-hit != 'true' }}
-        name: "[Pre-install] Download Unity Editor + Windows IL2CPP builder"
+        name: "[Install] Download Unity Editor + Windows IL2CPP builder"
         continue-on-error: true
         run: >
           mkdir ${{ runner.temp }}\UnityInstall;
@@ -102,7 +104,7 @@ jobs:
           curl -L -o "${{ runner.temp }}\UnityInstall\UnitySetup-Windows-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.exe" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/TargetSupportInstaller/UnitySetup-Windows-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.exe;
 
       - if: ${{ steps.unity-install.outputs.cache-hit != 'true' }}
-        name: "[Pre-install] Install Unity"
+        name: "[Install] Install Unity"
         run: >
           $UNITY_INSTALLARGUMENTS = "/S /D=${{ runner.temp }}\\Unity";
           Start-Process "${{ runner.temp }}\UnityInstall\UnitySetup64-${{ env.unityVersion }}.exe" -ArgumentList $UNITY_INSTALLARGUMENTS -wait -nonewwindow;
@@ -120,20 +122,26 @@ jobs:
           Remove-Item -Recurse -Force -Path ${{ github.workspace }}\build\YARG_BurstDebugInformation_DoNotShip\*;
 
       ###########################
+      #        Compress         #
+      ###########################
+      - name: "[Post-build] Compress for release"
+        run: >
+          mkdir Release;
+          Compress-Archive -Path ${{ github.workspace }}/build/* -DestinationPath ${{ github.workspace }}/Release/YARG-${{ env.commitSHA || 'dev' }}.zip;
+
+      ###########################
       #         Upload          #
       ###########################
       - name: "[Post-build] Upload to artifacts"
         uses: actions/upload-artifact@v3
         with:
-          name: Finished build
+          name: Build Folder
           path: build
 
-      - name: "[Post-build] Upload to releases on ${{ vars.DEVBUILD_REPOSITORY }}"
+      - name: "[Post-build] Upload to releases"
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          files: build/*
+          files: Release/*
           fail_on_unmatched_files: true
-          name: ${{ github.event.head_commit }}
-          repository: ${{ vars.DEVBUILD_REPOSITORY }}
-          token : ${{ secrets.DEVBUILD_TOKEN }}
+          name: ${{ env.commitSHA }}
