@@ -1,0 +1,28 @@
+name: Prepare Cache - Blender Installer (Win - 3.5.1)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cacheBlender:
+    name: Prepare Cache - Blender
+    runs-on: windows-2019
+    timeout-minutes: 90
+
+    steps:
+      ###########################
+      #     Install Blender     #
+      ###########################
+
+      - name: "[Pre-install] Get Blender (3.5.1) from cache"
+        id: blender
+        uses: actions/cache@v3
+        with: 
+          path: ${{ runner.temp }}/BlenderInstall
+          key: windows-blender-3.5.1
+          restore-keys: windows-blender-
+
+      - if: ${{ steps.blender.outputs.cache-hit != 'true' }}
+        name: "[Pre-install] Download Blender (3.5.1)"
+        continue-on-error: true
+        run: mkdir ${{ runner.temp }}\BlenderInstall && curl -L -o "${{ runner.temp }}\BlenderInstall\blender.msi" https://download.blender.org/release/Blender3.5/blender-3.5.1-windows-x64.msi

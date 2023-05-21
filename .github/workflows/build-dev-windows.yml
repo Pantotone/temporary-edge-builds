@@ -47,20 +47,20 @@ jobs:
       ###########################
 
 
-      - name: "[Pre-install] Get Blender (3.4.1) from cache"
+      - name: "[Pre-install] Get Blender (3.5.1) from cache"
         id: blender
         uses: actions/cache@v3
         with: 
           path: ${{ runner.temp }}/BlenderInstall
-          key: windows-blender-3.4.1
+          key: windows-blender-3.5.1
           restore-keys: windows-blender-
 
       - if: ${{ steps.blender.outputs.cache-hit != 'true' }}
-        name: "[Pre-install] Download Blender (3.4.1)"
+        name: "[Pre-install] Download Blender (3.5.1)"
         continue-on-error: true
         run: mkdir ${{ runner.temp }}\BlenderInstall && curl -L -o "${{ runner.temp }}\BlenderInstall\blender.msi" https://download.blender.org/release/Blender3.5/blender-3.5.1-windows-x64.msi
 
-      - name: "[Pre-install] Install Blender (3.4.1)"
+      - name: "[Pre-install] Install Blender (3.5.1)"
         run: >
           $BLENDERMSI = "${{ runner.temp }}\BlenderInstall\blender.msi";
           $BLENDERARGS = "/I $BLENDERMSI ALLUSERS=1 /qn /norestart";
