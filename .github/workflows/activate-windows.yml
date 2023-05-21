@@ -25,7 +25,8 @@ jobs:
           path: ${{ runner.temp }}/Unity
           key: windows-unity-${{ env.unityVersion }}
 
-      - name: "Download Unity Editor + Windows IL2CPP builder"
+      - if: ${{ steps.unity-install.outputs.cache-hit != 'true' }}
+        name: "Download Unity Editor + Windows IL2CPP builder"
         continue-on-error: true
         run: >
           mkdir ${{ runner.temp }}\UnityInstall;
