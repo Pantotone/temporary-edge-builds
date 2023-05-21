@@ -135,8 +135,8 @@ jobs:
       - name: "[Post-build] Upload to artifacts"
         uses: actions/upload-artifact@v3
         with:
-          name: Build Folder
-          path: build
+          name: Releases
+          path: Release
 
       - name: "[Post-build] Upload to releases"
         uses: softprops/action-gh-release@v1
