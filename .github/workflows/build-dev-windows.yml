@@ -11,6 +11,9 @@ env:
   unityVersion: "2021.3.21f1"
   unityVersionHash: "1b156197d683"
 
+permissions:
+  contents: write
+
 jobs:
   windowsBuilder:
     name: Windows Build
@@ -139,10 +142,11 @@ jobs:
           path: Release
 
       - name: "[Post-build] Upload to releases"
-        uses: softprops/action-gh-release@v1
+        uses: svenstaro/upload-release-action@v2
         with:
-          prerelease: true
-          files: Release/*
-          tag_name: devbuild
-          fail_on_unmatched_files: true
-          name: ${{ env.commitSHA }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: ${{ env.commitSHA || 'Development build' }}
+          file: Release/*
+          file_glob: true
+          tag: devbuild
+          overwrite: true
