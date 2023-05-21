@@ -143,5 +143,6 @@ jobs:
         with:
           prerelease: true
           files: Release/*
+          tag_name: devbuild
           fail_on_unmatched_files: true
           name: ${{ env.commitSHA }}
