@@ -36,7 +36,7 @@ jobs:
         run: |
           "commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $env:GITHUB_OUTPUT;
           "commitShortSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-7)" >> $env:GITHUB_OUTPUT;
-          "commitInfo=$(git log -1 --stat)" >> $env:GITHUB_OUTPUT;
+          "commitInfo=$(git log -1 --stat --pretty=tformat:"Build based on commit https://github.com/YARC-Official/YARG/commit/%H by %aN <%aE> \nDate: %ai\n\nUpdates:\n - %s\n\n    %b" --name-only)" >> $env:GITHUB_OUTPUT;
 
       ###########################
       #          Cache          #
