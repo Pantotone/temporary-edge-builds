@@ -33,8 +33,8 @@ jobs:
 
       - name: "[Pre-install] Save commit sha into output"
         id: commitSHA
-        shell: pwsh
-        run: \"commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $env:GITHUB_OUTPUT
+        run: |
+         "commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $env:GITHUB_OUTPUT
 
       ###########################
       #          Cache          #
