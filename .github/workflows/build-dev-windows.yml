@@ -35,6 +35,7 @@ jobs:
         id: latestCommit
         run: |
           "commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $env:GITHUB_OUTPUT;
+          "commitShortSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-7)" >> $env:GITHUB_OUTPUT;
           "commitInfo=$(git log -1 --stat)" >> $env:GITHUB_OUTPUT;
 
       ###########################
@@ -149,7 +150,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           release_name: Nightly Build - ${{ steps.latestCommit.outputs.commitSHA }}
-          tag: ${{ steps.latestCommit.outputs.commitSHA }}
+          tag: ${{ steps.latestCommit.outputs.commitShortSHA }}
           file: Release/*
           file_glob: true
           body: ${{ steps.latestCommit.outputs.commitInfo }}
