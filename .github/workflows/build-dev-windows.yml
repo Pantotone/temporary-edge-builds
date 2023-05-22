@@ -148,5 +148,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           release_name: Nightly Build - ${{ steps.commitSHA.outputs.commitSHA }}
+          tag: ${{ steps.commitSHA.outputs.commitSHA }}
           file: Release/*
           file_glob: true
