@@ -31,8 +31,9 @@ jobs:
           ref: dev
           lfs: true
 
-      - name: "[Pre-install] Save commit sha into env"
-        run: echo "commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $GITHUB_ENV
+      - name: "[Pre-install] Save commit sha into output"
+        id: commitSHA
+        run: \"commitSHA=$(git show-ref | grep refs/remotes/origin/dev | cut -c1-40)" >> $env:GITHUB_OUTPUT
 
       ###########################
       #          Cache          #
@@ -130,7 +131,7 @@ jobs:
       - name: "[Post-build] Compress for release"
         run: >
           mkdir Release;
-          Compress-Archive -Path ${{ github.workspace }}/build/* -DestinationPath ${{ github.workspace }}/Release/YARG-${{ env.commitSHA || 'dev' }}.zip;
+          Compress-Archive -Path ${{ github.workspace }}/build/* -DestinationPath ${{ github.workspace }}/Release/YARG-${{ steps.commitSHA.outputs.commitSHA }}.zip;
 
       ###########################
       #         Upload          #
@@ -145,8 +146,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: ${{ env.commitSHA || 'Development build' }}
+          release_name: Nightly Build - ${{ steps.commitSHA.outputs.commitSHA }}
           file: Release/*
           file_glob: true
-          tag: devbuild
-          overwrite: true
