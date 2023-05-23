@@ -4,6 +4,8 @@ on:
   repository_dispatch:
     types: [new_edge_build]
   workflow_dispatch:
+  schedule:
+    - cron: '25 0,12 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
