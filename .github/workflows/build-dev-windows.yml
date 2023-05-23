@@ -122,12 +122,10 @@ jobs:
       #          Build          #
       ###########################
       - name: "[Build] Get license file"
-        shell: bash
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         run: |
-          echo "::add-mask::$UNITY_LICENSE"
-          echo $UNITY_LICENSE >> ${{ runner.temp }}/UnityLicense.ulf
+          Set-Content ${{ runner.temp }}/UnityLicense.ulf -Value $env:UNITY_LICENSE -AsByteStream;
 
       - name: "[Build] Run Builder"
         run: >
