@@ -122,10 +122,12 @@ jobs:
       #          Build          #
       ###########################
       - name: "[Build] Get license file"
-        run: >
-          $LICENSE_CONTENT = ${{ secrets.UNITY_LICENSE }};
-          Write-Output "::add-mask::$LICENSE_CONTENT";
-          Out-File -FilePath ${{ runner.temp }}/UnityLicense.ulf -InputObject $LICENSE_CONTENT
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          echo "::add-mask::$UNITY_LICENSE"
+          echo $UNITY_LICENSE >> ${{ runner.temp }}/UnityLicense.ulf
 
       - name: "[Build] Run Builder"
         run: >
