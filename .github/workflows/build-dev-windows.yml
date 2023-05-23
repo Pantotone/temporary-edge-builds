@@ -121,7 +121,7 @@ jobs:
       ###########################
       #          Build          #
       ###########################
-      - name: Get license file
+      - name: "[Build] Get license file"
         run: >
           $LICENSE_CONTENT = ${{ secrets.UNITY_LICENSE }};
           Write-Output "::add-mask::$LICENSE_CONTENT";
