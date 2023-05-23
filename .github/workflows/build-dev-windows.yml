@@ -125,7 +125,7 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         run: |
-          Set-Content ${{ runner.temp }}/UnityLicense.ulf -Value $env:UNITY_LICENSE -AsByteStream;
+          Set-Content ${{ runner.temp }}/UnityLicense.ulf -Value $env:UNITY_LICENSE;
 
       - name: "[Build] Run Builder"
         run: >
