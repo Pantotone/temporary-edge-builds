@@ -121,9 +121,15 @@ jobs:
       ###########################
       #          Build          #
       ###########################
+      - name: Get license file
+        run: >
+          $LICENSE_CONTENT = ${{ secrets.UNITY_LICENSE }};
+          Write-Output "::add-mask::$LICENSE_CONTENT";
+          Out-File -FilePath ${{ runner.temp }}/UnityLicense.ulf -InputObject $LICENSE_CONTENT
+
       - name: "[Build] Run Builder"
         run: >
-          ${{ runner.temp }}/Unity/Editor/Unity.exe -quit -batchmode -nographics -projectPath ${{ github.workspace }} -buildTarget StandaloneWindows64 -buildWindows64Player ${{ github.workspace }}/build/YARG.exe -username ${{ secrets.UNITY_EMAIL }} -password ${{ secrets.UNITY_PASSWORD }} -serial ${{ secrets.WINDOWS_UNITY_SERIAL }} -logfile | Out-Host;
+          ${{ runner.temp }}/Unity/Editor/Unity.exe -quit -batchmode -nographics -projectPath ${{ github.workspace }} -buildTarget StandaloneWindows64 -buildWindows64Player ${{ github.workspace }}/build/YARG.exe -username ${{ secrets.UNITY_EMAIL }} -password ${{ secrets.UNITY_PASSWORD }} -manualLicenseFile ${{ runner.temp }}/UnityLicense.ulf -logfile | Out-Host;
           Write-Output "$('Finished build, exit code ')$($LastExitCode)$('"')";
           Remove-Item -Recurse -Force -Path ${{ github.workspace }}\build\YARG_BurstDebugInformation_DoNotShip\*;
 
