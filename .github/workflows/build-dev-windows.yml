@@ -1,6 +1,8 @@
 name: Builds - Windows (development)
 
 on:
+  repository_dispatch:
+    types: [new_edge_build]
   workflow_dispatch:
 
 concurrency:
