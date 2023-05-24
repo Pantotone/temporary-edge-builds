@@ -135,7 +135,7 @@ jobs:
       - name: "[Post-build] Compress for release"
         run: >
           mkdir Release;
-          Compress-Archive -Path ${{ github.workspace }}/build/* -DestinationPath ${{ github.workspace }}/Release/YARG-Windows64-${{ steps.latestCommit.outputs.commitSHA }}.zip;
+          Compress-Archive -Path ${{ github.workspace }}/build/* -DestinationPath ${{ github.workspace }}/Release/YARG_${{ steps.latestCommit.outputs.commitSHA }}-Windows-x64.zip;
 
       ###########################
       #         Upload          #
