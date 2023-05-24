@@ -1,4 +1,4 @@
-name: Builds - Windows (development)
+name: Builds - Mac (development)
 
 on:
   repository_dispatch:
