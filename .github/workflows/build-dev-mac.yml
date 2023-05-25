@@ -92,11 +92,6 @@ jobs:
       ###########################
       #          Build          #
       ###########################
-      - name: "[Build] Define game repository last commit SHA to GITHUB_SHA"
-        run: echo "${{ steps.latestCommit.outputs.commitSHA }}" >> "$GITHUB_SHA"
-
-      - name: "[DEBUG] Check what files on workspace"
-        run: ls
 
       - name: "[Build] Run Builder"
         uses: game-ci/unity-builder@v2.2.0
@@ -105,6 +100,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.MAC_UNITY_LICENSE || secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.MAC_UNITY_EMAIL || secrets.UNITY_EMAIL  }}
           UNITY_PASSWORD: ${{ secrets.MAC_UNITY_PASSWORD || secrets.UNITY_PASSWORD }}
+          GITHUB_SHA: ${{ steps.latestCommit.outputs.commitSHA }}
         with:
           buildName: YARG
           unityVersion: 2021.3.21f1
