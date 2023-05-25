@@ -101,8 +101,8 @@ jobs:
 
       - name: "[Install] Install Unity Editor + Mac IL2CPP builder"
         run: |
-          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.pkg" -target "/" -verbose &&
-          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.pkg" -target "/" -verbose &&
+          sudo installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.pkg" -target "/" -verbose &&
+          sudo installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.pkg" -target "/" -verbose &&
           rm -rf "${{ runner.temp }}/UnityInstall"
 
       - name: "[Build] Run Builder"
