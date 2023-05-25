@@ -52,6 +52,7 @@ jobs:
 
       - name: "[Install] Install Unity Editor + Linux IL2CPP builder"
         run: |
+          mkdir "${{ runner.temp }}/Unity" &&
           tar -xvf "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.tar.xz" -C "${{ runner.temp }}/Unity" &&
           tar -xvf "${{ runner.temp }}/UnityInstall/UnitySetup-Linux-IL2CPP-Support.tar.xz" -C "${{ runner.temp }}/Unity" &&
           rm -rf "${{ runner.temp }}/UnityInstall"
