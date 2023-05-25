@@ -95,6 +95,9 @@ jobs:
       - name: "[Build] Define game repository last commit SHA to GITHUB_SHA"
         run: echo "${{ steps.latestCommit.outputs.commitSHA }}" >> "$GITHUB_SHA"
 
+      - name: "[DEBUG] Check what files on workspace"
+        run: ls
+
       - name: "[Build] Run Builder"
         uses: game-ci/unity-builder@v2.2.0
         continue-on-error: true
@@ -106,6 +109,7 @@ jobs:
           buildName: YARG
           unityVersion: 2021.3.21f1
           targetPlatform: StandaloneOSX
+          allowDirtyBuild: true
 
       ###########################
       #        Compress         #
