@@ -93,7 +93,7 @@ jobs:
       #          Build          #
       ###########################
       - name: "[Build] Define game repository last commit SHA to GITHUB_SHA"
-        run: echo ${{ steps.latestCommit.outputs.commitSHA }} >> "$GITHUB_OUTPUT"
+        run: echo "${{ steps.latestCommit.outputs.commitSHA }}" >> "$GITHUB_SHA"
 
       - name: "[Build] Run Builder"
         uses: game-ci/unity-builder@v2.2.0
