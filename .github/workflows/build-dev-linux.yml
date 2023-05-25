@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo apt-get -q update &&
           sudo apt-get -q install -y --no-install-recommends apt-utils &&
-          sudo apt-get -q install -y --no-install-recommends --allow-downgrades ca-certificates libasound2 libc6-dev libcap2 libgconf-2-4 libglu1 libgtk-3-0 libncurses5 libnotify4 libnss3 libxtst6 libxss1 cpio lsb-release python python-setuptools xvfb xz-utils && 
+          sudo apt-get -q install -y --no-install-recommends --allow-downgrades ca-certificates libasound2 libc6-dev libcap2 libgconf-2-4 libglu1 libgtk-3-0 libncurses5 libnotify4 libnss3 libxtst6 libxss1 cpio lsb-release xvfb xz-utils && 
           sudo apt-get clean && 
           sudo rm -rf /var/lib/apt/lists/* &&
           sudo apt-get -q update &&
