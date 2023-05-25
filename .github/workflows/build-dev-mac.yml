@@ -113,7 +113,7 @@ jobs:
       #        Compress         #
       ###########################
       - name: "[Post-build] Compress to a .zip"
-        run: ditto -c -k --keepParent build/YARG.app YARG_${{ steps.latestCommit.outputs.commitSHA }}-MacOS-Universal.zip
+        run: ditto -c -k --keepParent build/YARG.app Release/YARG_${{ steps.latestCommit.outputs.commitSHA }}-MacOS-Universal.zip
         
       ###########################
       #         Upload          #
