@@ -96,13 +96,13 @@ jobs:
       - name: "[Install] Download Unity Editor + Mac IL2CPP builder"
         run: |
           mkdir ${{ runner.temp }}/UnityInstall &&
-          curl -L -o "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.dmg" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/MacEditorInstaller/Unity-${{ env.unityVersion }}.pkg &&
-          curl -L -o "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.dmg" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/MacEditorTargetInstaller/UnitySetup-Mac-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.pkg        
+          curl -L -o "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.pkg" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/MacEditorInstaller/Unity-${{ env.unityVersion }}.pkg &&
+          curl -L -o "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.pkg" https://download.unity3d.com/download_unity/${{ env.unityVersionHash }}/MacEditorTargetInstaller/UnitySetup-Mac-IL2CPP-Support-for-Editor-${{ env.unityVersion }}.pkg        
 
       - name: "[Install] Install Unity Editor + Mac IL2CPP builder"
         run: |
-          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.dmg" -target "/" -verbose &&
-          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.dmg" -target "/" -verbose &&
+          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Editor.pkg" -target "/" -verbose &&
+          /usr/sbin/installer -pkg "${{ runner.temp }}/UnityInstall/UnitySetup-Mac-IL2CPP-Support.pkg" -target "/" -verbose &&
           rm -rf "${{ runner.temp }}/UnityInstall"
 
       - name: "[Build] Run Builder"
