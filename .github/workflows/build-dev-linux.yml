@@ -87,11 +87,24 @@ jobs:
       #     Install Blender     #
       ###########################
 
-      - name: "[Pre-install] Install Blender (latest version)"
+      - name: "[Pre-install] Get Blender (3.4.1) from cache"
+        id: blender
+        uses: actions/cache@v3
+        with: 
+          path: ${{ runner.temp }}/BlenderInstall
+          key: linux-blender-3.4.1
+          restore-keys: linux-blender-
+
+      - if: ${{ steps.blender.outputs.cache-hit != 'true' }}
+        name: "[Pre-install] Download Blender (3.4.1)"
+        continue-on-error: true
+        run: mkdir ${{ runner.temp }}/BlenderInstall && curl -L -o "${{ runner.temp }}/BlenderInstall/blender.tar.xz" https://download.blender.org/release/Blender3.4/blender-3.4.1-linux-x64.tar.xz
+
+      - name: "[Pre-install] Install Blender (3.4.1)"
         run: >
-          sudo add-apt-repository ppa:thomas-schiex/blender &&
-          sudo apt-get update &&
-          sudo apt-get install blender
+          sudo tar xvf "${{ runner.temp }}/BlenderInstall/blender.tar.xz" -C /opt/ &&
+          sudo mv /opt/blender*/ /opt/blender &&
+          sudo ln -sf /opt/blender/blender /usr/bin/blender
 
       ###########################
       #    Install Libraries    #
