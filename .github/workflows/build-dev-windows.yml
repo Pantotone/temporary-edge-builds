@@ -155,6 +155,6 @@ jobs:
           file: Release/*
           file_glob: true
           body: |
-            "Built using the commit https://github.com/YARC-Official/YARG/commit/${{ steps.latestCommit.outputs.commitSHA }}
+            Built using the commit https://github.com/YARC-Official/YARG/commit/${{ steps.latestCommit.outputs.commitSHA }}
             
-            ${{ vars.RELEASE_BODYMESSAGE || '' }}"
+            ${{ vars.RELEASE_BODYMESSAGE || '' }}
